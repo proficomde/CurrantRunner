@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.proficom.currantrunner</groupId>
+		<artifactId>currantrunner</artifactId>
+		<version>0.0.1</version>
+	</parent>
+
+	<artifactId>currantrunner-core</artifactId>
+	<name>CurrantRunner Core Libs</name>
+	<packaging>jar</packaging>
+
+	<licenses>
+		<license>
+			<name>BSD 2-Clause License</name>
+			<url>https://choosealicense.com/licenses/bsd-2-clause/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<organization>
+		<name>proficom GmbH</name>
+		<url>https://www.proficom.de</url>
+	</organization>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.agent</artifactId>
+			<classifier>runtime</classifier>
+		</dependency>
+		<dependency>
+			<groupId>nz.ac.waikato.cms.weka</groupId>
+			<artifactId>weka-stable</artifactId>
+		</dependency>
+	</dependencies>
+	
+</project>

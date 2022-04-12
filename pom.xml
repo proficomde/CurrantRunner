@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.proficom.currantrunner</groupId>
+	<artifactId>currantrunner</artifactId>
+	<version>0.0.1</version>
+	
+	<name>CurrantRunner</name>
+	<packaging>pom</packaging>
+	
+	<licenses>
+		<license>
+			<name>BSD 2-Clause License</name>
+			<url>https://choosealicense.com/licenses/bsd-2-clause/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<organization>
+		<name>proficom GmbH</name>
+		<url>https://www.proficom.de</url>
+	</organization>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<!-- Versions of CurrantRunner's child POMs -->
+		<versions.CurrantRunner>0.0.1</versions.CurrantRunner>
+		
+		<!-- Versions of used libraries -->
+		<versions.TestNG>7.4.0</versions.TestNG>
+		<versions.H2>1.4.194</versions.H2>
+		<versions.JaCoCo>0.8.6</versions.JaCoCo>
+	  	<versions.Weka>3.8.6</versions.Weka>
+		<versions.MavenSureFire>3.0.0-M5</versions.MavenSureFire>
+		<versions.MavenDeployPlugin>3.0.0-M2</versions.MavenDeployPlugin>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
+				<version>${versions.TestNG}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>${versions.H2}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jacoco</groupId>
+				<artifactId>org.jacoco.core</artifactId>
+				<version>${versions.JaCoCo}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jacoco</groupId>
+				<artifactId>org.jacoco.agent</artifactId>
+				<classifier>runtime</classifier>
+				<version>${versions.JaCoCo}</version>
+			</dependency>
+			<dependency>
+				<groupId>nz.ac.waikato.cms.weka</groupId>
+				<artifactId>weka-stable</artifactId>
+				<version>${versions.Weka}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${versions.MavenSureFire}</version>
+					<!-- Pre-configured values for CurrantRunner -->
+					<configuration>
+						<systemPropertyVariables>
+							<currantRunner.maxMissingCounter>20</currantRunner.maxMissingCounter>
+							<currantRunner.dataDirectory>CurrantRunner</currantRunner.dataDirectory>
+						</systemPropertyVariables>
+					</configuration>
+				</plugin>
+				<!-- Needed 2.8 for deployment -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>${versions.MavenDeployPlugin}</version>
+				</plugin>
+				<!-- Needed JaCoCo version CurrantRunner -->
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${versions.JaCoCo}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<modules>
+		<module>currantrunner-core</module>
+		<module>currantrunner-testng-maven</module>
+	</modules>
+
+</project>

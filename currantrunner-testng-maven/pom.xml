@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.proficom.currantrunner</groupId>
+		<artifactId>currantrunner</artifactId>
+		<version>0.0.1</version>
+	</parent>
+
+	<artifactId>currantrunner-testng-maven</artifactId>
+	<name>CurrantRunner (TestNG) Maven :: Parent POM</name>
+	<packaging>pom</packaging>
+	
+	<licenses>
+		<license>
+			<name>BSD 2-Clause License</name>
+			<url>https://choosealicense.com/licenses/bsd-2-clause/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<organization>
+		<name>proficom GmbH</name>
+		<url>https://www.proficom.de</url>
+	</organization>
+	
+	<!-- Add dependencies for TestNG and CurrantRunner libs -->
+	<dependencies>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.proficom.currantrunner</groupId>
+			<artifactId>currantrunner-core</artifactId>
+			<version>${versions.CurrantRunner}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Surefire plugin: Set listener for test prioritization -->
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<properties>
+						<property>
+							<name>listener</name>
+							<value>de.proficom.currantrunner.testng.TestExecutionListener,de.proficom.currantrunner.testng.TestRunListener,de.proficom.currantrunner.testng.TestSuiteListener</value>
+						</property>
+					</properties>
+				</configuration>
+			</plugin>
+
+			<!-- JaCoCo plugin: Start the JaCoCo runner for class instrumentation, exclude internal files -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludes>
+						<exclude>org/testng/**</exclude>
+						<exclude>org/jacoco/**</exclude>
+						<exclude>org/h2/**/*</exclude>
+						<exclude>nz/ac/waikato/cms/weka/**/*</exclude>
+						<exclude>de/proficom/currantrunner/**</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
