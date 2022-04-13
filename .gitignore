@@ -31,4 +31,4 @@ buildNumber.properties
 .classpath
 
 # CurrantRunner
-CurrantRunner/
+CurrantRunner/**
