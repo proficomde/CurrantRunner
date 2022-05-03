@@ -170,7 +170,7 @@ public class UniquenessCalculation {
 
 	/**
 	 * Calculate the cosine similarity between two vectors in a multidimensional
-	 * space. The cosine is applied to the ankle between the two vectors.
+	 * space. The cosine is applied to the angle between the two vectors.
 	 * 
 	 * @param v1 vector 1
 	 * @param v2 vector 2
