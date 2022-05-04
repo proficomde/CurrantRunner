@@ -1,5 +1,6 @@
 package de.proficom.currantrunner.core;
 
+import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -98,7 +99,7 @@ public class DatabaseConnector {
 
 			// table schema to store the ml model in bytes
 			createModelTable = conn.prepareStatement(
-					"CREATE TABLE " + TABLE_MODEL + " (type VARCHAR(255),content BINARY,UNIQUE (type));");
+					"CREATE TABLE " + TABLE_MODEL + " (type VARCHAR(255),content BINARY LARGE OBJECT,UNIQUE (type));");
 
 			/*
 			 * Activate the next statement if you have added some metrics
@@ -465,33 +466,21 @@ public class DatabaseConnector {
 	// --- MODEL DATA ---
 
 	/**
+	 * Update the model content in the database.
 	 * If not model data is available, a new model is created
 	 * 
 	 * @param model the byte representation of the deserialized model object.
 	 */
-	public void insertModel(byte[] model) {
+	public void insertOrUpdateModel(byte[] model) {
 		try {
-			insertNewModel.setBytes(1, model);
-			insertNewModel.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-	}
-
-	/**
-	 * Update the model content in the database.
-	 * 
-	 * @param model the byte representation of the deserialized model object.
-	 */
-	public void updateModel(byte[] model) {
-		// if not a new one is inserted instead of updated
-		if (getModel() == null) {
-			insertModel(model);
-			return;
-		}
-		try {
-			updateModelContent.setBytes(1, model);
-			updateModelContent.executeUpdate();
+			ByteArrayInputStream inputStreamModel = new ByteArrayInputStream(model);
+			if (getModel() == null) {
+				insertNewModel.setBinaryStream(1, inputStreamModel, model.length);
+				insertNewModel.executeUpdate();
+			} else {
+				updateModelContent.setBinaryStream(1, inputStreamModel, model.length);
+				updateModelContent.executeUpdate();
+			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
@@ -509,7 +498,8 @@ public class DatabaseConnector {
 			results = getModelContent.executeQuery();
 			while (results.next()) {
 				// returns directly, because only one model per type is saved
-				return results.getBytes(2);
+				model = results.getBytes("content");
+				break;
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());

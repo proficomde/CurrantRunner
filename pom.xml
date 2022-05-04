@@ -28,7 +28,7 @@
 		
 		<!-- Versions of used libraries -->
 		<versions.TestNG>7.4.0</versions.TestNG>
-		<versions.H2>1.4.194</versions.H2>
+		<versions.H2>2.1.212</versions.H2>
 		<versions.JaCoCo>0.8.6</versions.JaCoCo>
 	  	<versions.Weka>3.8.6</versions.Weka>
 		<versions.MavenSureFire>3.0.0-M5</versions.MavenSureFire>

@@ -90,7 +90,7 @@ public class MLModel {
 			ByteArrayOutputStream modelStream = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(modelStream);
 			oos.writeObject(HTClassifier);
-			db.updateModel(modelStream.toByteArray());
+			db.insertOrUpdateModel(modelStream.toByteArray());
 			oos.flush();
 			oos.close();
 			modelStream.flush();
@@ -220,7 +220,7 @@ public class MLModel {
 			ByteArrayOutputStream modelStream = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(modelStream);
 			oos.writeObject(HTClassifier);
-			db.updateModel(modelStream.toByteArray());
+			db.insertOrUpdateModel(modelStream.toByteArray());
 			oos.flush();
 			oos.close();
 			modelStream.flush();
