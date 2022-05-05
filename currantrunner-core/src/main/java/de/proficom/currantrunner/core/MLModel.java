@@ -1,16 +1,11 @@
 package de.proficom.currantrunner.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 import de.proficom.currantrunner.metrics.MetricsBase;
-import weka.classifiers.Classifier;
 import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -34,22 +29,10 @@ public class MLModel {
 	 * database.
 	 */
 	public MLModel(DatabaseConnector db) {
-		byte[] modelBytes = db.getModel();
 		// if classifier stays uninitialized, a new model is build later.
-		if (modelBytes == null) {
-			return;
-		}
-
-		try {
-			// Get the runtime object from the byte representation.
-			ByteArrayInputStream modelStream = new ByteArrayInputStream(modelBytes);
-			ObjectInputStream ois = new ObjectInputStream(modelStream);
-			Classifier cls = (Classifier) ois.readObject();
-			HTClassifier = (HoeffdingTree) cls;
-			ois.close();
-			modelStream.close();
-		} catch (Exception e) {
-			System.out.println("There is no model in the database yet.");
+		Object modelObj = db.getModel();
+		if (modelObj != null) {
+			this.HTClassifier = (HoeffdingTree) modelObj;
 		}
 	}
 
@@ -87,14 +70,7 @@ public class MLModel {
 			});
 
 			// Serialize the model/ Get the byte representation and save it in the database.
-			ByteArrayOutputStream modelStream = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(modelStream);
-			oos.writeObject(HTClassifier);
-			db.insertOrUpdateModel(modelStream.toByteArray());
-			oos.flush();
-			oos.close();
-			modelStream.flush();
-			modelStream.close();
+			db.insertOrUpdateModel(HTClassifier);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
@@ -116,9 +92,9 @@ public class MLModel {
 		
 		// Check if we have already a ML model and at least one testcase
 		if (HTClassifier == null) {
-			System.err.println("There is no model yet...");
+			System.err.println("[CurrantRunner] There is no model yet...");
 		} else if (testcases.size() <= 0) {
-			System.err.println("There is no testcases to prioritize...");
+			System.err.println("[CurrantRunner] There are no testcases to prioritize...");
 		} else {
 			// create the needed data format for the ml model
 			Instances instances = createARFFData(testcases);
@@ -160,7 +136,7 @@ public class MLModel {
 		 * input is returned.
 		 */
 		if (HTClassifier == null || testcases.size() == 0) {
-			System.err.println("There is no model yet. Will use original order...");
+			System.err.println("[CurrantRunner] Use original order of tests...");
 			return new ArrayList<TestCase>(testcases);
 		}
 
@@ -210,26 +186,19 @@ public class MLModel {
 		inst.setClassIndex(inst.numAttributes() - 1);
 
 		try {
-			 // increases accuracy and training performance
+			// increases accuracy and training performance
 			HTClassifier.setBatchSize("5");
 
 			// after model parameterization, the model is build with the training data
-			HTClassifier.buildClassifier(inst); 
+			HTClassifier.buildClassifier(inst);
 
-			// Serialize the model/ Get the byte representation and save it in the database.
-			ByteArrayOutputStream modelStream = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(modelStream);
-			oos.writeObject(HTClassifier);
-			db.insertOrUpdateModel(modelStream.toByteArray());
-			oos.flush();
-			oos.close();
-			modelStream.flush();
-			modelStream.close();
+			// Store initial model in DB
+			db.insertOrUpdateModel(HTClassifier);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * ARFF is the standard data format used for training and testing weka machine
 	 * learning models. This method takes a list of mapped {@link TestCase} with

@@ -1,6 +1,5 @@
 package de.proficom.currantrunner.core;
 
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -99,7 +98,7 @@ public class DatabaseConnector {
 
 			// table schema to store the ml model in bytes
 			createModelTable = conn.prepareStatement(
-					"CREATE TABLE " + TABLE_MODEL + " (type VARCHAR(255),content BINARY LARGE OBJECT,UNIQUE (type));");
+					"CREATE TABLE " + TABLE_MODEL + " (type VARCHAR(255),content JAVA_OBJECT,UNIQUE (type));");
 
 			/*
 			 * Activate the next statement if you have added some metrics
@@ -469,16 +468,15 @@ public class DatabaseConnector {
 	 * Update the model content in the database.
 	 * If not model data is available, a new model is created
 	 * 
-	 * @param model the byte representation of the deserialized model object.
+	 * @param model		model class to be stored in DB
 	 */
-	public void insertOrUpdateModel(byte[] model) {
+	public void insertOrUpdateModel(Object model) {
 		try {
-			ByteArrayInputStream inputStreamModel = new ByteArrayInputStream(model);
 			if (getModel() == null) {
-				insertNewModel.setBinaryStream(1, inputStreamModel, model.length);
+				insertNewModel.setObject(1, model);
 				insertNewModel.executeUpdate();
 			} else {
-				updateModelContent.setBinaryStream(1, inputStreamModel, model.length);
+				updateModelContent.setObject(1, model);
 				updateModelContent.executeUpdate();
 			}
 		} catch (SQLException e) {
@@ -488,17 +486,17 @@ public class DatabaseConnector {
 
 	/**
 	 * Get the model bytes that are stored in the database.
+	 * Return null if there is no model in the database
 	 * 
-	 * @return the deserialized model in bytes from the database.
+	 * @return the model class from the database.
 	 */
-	public byte[] getModel() {
-		byte[] model = null; // if there is not model yet, null is returned
+	public Object getModel() {
+		Object model = null; // if there is not model yet, null is returned
 		ResultSet results;
 		try {
 			results = getModelContent.executeQuery();
 			while (results.next()) {
-				// returns directly, because only one model per type is saved
-				model = results.getBytes("content");
+				model = results.getObject("content");
 				break;
 			}
 		} catch (SQLException e) {
@@ -506,7 +504,6 @@ public class DatabaseConnector {
 		} catch (Exception e) { // second exception can happen, when results is null, but accessed with .next()
 			System.out.println(e.getMessage());
 		}
-		// return null if there is no model in the database
 		return model;
 	}
 }
